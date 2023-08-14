@@ -1,0 +1,12 @@
+org: angelmenam
+app: aws-shake-shack-frontend
+service: aws-shake-shack-backend
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  function1:
+    handler: index.handler
