@@ -1,6 +1,6 @@
 org: angelmenam
-app: aws-shake-shack-frontend
-service: aws-shake-shack-backend
+app: aws-shake-shack
+service: aws-shake-shack-backend-t3
 frameworkVersion: '3'
 
 provider:
@@ -8,5 +8,15 @@ provider:
   runtime: nodejs18.x
 
 functions:
-  function1:
-    handler: index.handler
+  getProductsList:
+    handler: handlers.getProductsList
+    events:
+      - http:
+          path: /products
+          method: get
+  getProductsById:
+    handler: handlers.getProductsById
+    events:
+      - http:
+          path: /products/{productId}
+          method: get
