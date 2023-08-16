@@ -1,22 +1,81 @@
 org: angelmenam
 app: aws-shake-shack
-service: aws-shake-shack-backend-t3
+service: aws-shake-shack-backend-t4
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs18.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:BatchWriteItem
+      Resource:
+        - arn:aws:dynamodb:us-east-1:717957209526:table/ProductsTable
+        - arn:aws:dynamodb:us-east-1:717957209526:table/StocksTable
+
+plugins:
+  - serverless-dynamodb-seed
+
+custom:
+  seed:
+    productSeed:
+      table: ProductsTable
+      sources: 
+        - src\resources\products_seed.json
+    countSeed:
+      table: StocksTable
+      sources: 
+        - src\resources\stock_seed.json
+
+resources:
+  Resources:
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ProductsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    StocksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: StocksTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
 
 functions:
   getProductsList:
-    handler: handlers.getProductsList
+    handler: src/handlers/ProductService.getProductsList
     events:
       - http:
           path: /products
           method: get
-  getProductsById:
-    handler: handlers.getProductsById
+  getProductById:
+    handler: src/handlers/ProductService.getProductById
     events:
       - http:
           path: /products/{productId}
           method: get
+  createProduct:
+    handler: src/handlers/ProductService.createProduct
+    events:
+      - http:
+          path: /products/
+          method: post
