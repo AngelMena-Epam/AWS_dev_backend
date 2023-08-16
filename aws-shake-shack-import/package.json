@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "aws-sdk": "^2.1437.0",
+    "fast-csv": "^4.3.6"
+  }
+}

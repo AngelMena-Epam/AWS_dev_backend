@@ -1,0 +1,38 @@
+org: angelmenam
+app: aws-shake-shack
+service: aws-shake-shack-import
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action: "s3:*"
+      Resource:
+        - "arn:aws:s3:::*"
+    - Effect: Allow
+      Action: "s3:*"
+      Resource:
+        - "arn:aws:s3:::*/*"
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+      - http:
+          path: /import
+          method: get
+          request:
+            parameters:
+              querystrings:
+                name: true
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: aws-shake-shack-import
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
